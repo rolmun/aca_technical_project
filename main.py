@@ -16,18 +16,13 @@ SLACK_APP_TOKEN = os.environ.get("ACA_App_Socket_Mode_Token")
 
 app = App(token=SLACK_BOT_TOKEN)
 
-@app.event("app_mention")
-def mention_handler(body, context, payload, options, say, event):
-    say("Hello World!")
-
-
+#test w/ friend
 @app.event("member_joined_channel")
-def on_member_joined_channel(body, context, payload, options, say, event):
-    user = event['user']
-    welcome_text = f"Hello there <@{user}>, nice to meet you! :wave:\n\n" \
-    "Enjoy your time here, and let me know if you need any help!"
-    say(welcome_text)
-    
+def welcome_msg(event,say):
+    welcome_txt = f"Welcome <@{event['user']}> to the channel!"
+    say(text=welcome_txt, channel=event['channel'])
+
+
 @app.event("message")
 def mention_handler(body, context, payload, options, say, event):
     pass
