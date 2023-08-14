@@ -24,22 +24,25 @@ def mention_handler(body, context, payload, options, say, event):
     current_time = now.strftime("%m/%d/%Y | %H:%M:%S")
     say(f"Hi! The current time is {current_time}")
 
-@app.event("message")
-def handle_message(payload, context):
-    channel_id = payload.get('channel')
-    text = payload.get('text')
-    subtype = payload.get('subtype')
 
-    print(f"Full payload: {payload}")
-    print(f"Channel ID: {channel_id}, Text: {text}, Subtype: {subtype}")
 
-    client = context.client
+# Set to store user IDs who have initiated the recipricate mode
+recipricate_to_user = set()
 
-    if channel_id and text and subtype is None:  # Only respond to messages without a subtype
-        client.chat_postMessage(channel=channel_id, text=text)
-    else:
-        print("Not sending message, missing required fields or handling a subtype.")
+@app.message("recipricate")
+def initiate_recipricate(message, say):
+    user_id = message['user']
+    recipricate_to_user.add(user_id)
+    say(f"<@{user_id}>, you have initiated Recipricate mode. I'll echo back your message once.")
 
+@app.message() # This decorator will match all messages
+def echo_message(message, say):
+    user_id = message['user']
+    text = message['text']
+
+    if user_id in recipricate_to_user:  # Check if user has initiated recipricate mode
+        say(text=text)  # Echo back the text
+        recipricate_to_user.remove(user_id)  # Remove user from the set, so the echo only happens once
 
 
 
